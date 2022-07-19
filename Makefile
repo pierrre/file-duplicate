@@ -6,6 +6,21 @@ noop:
 
 CI?=false
 
+VERSION?=$(shell (git describe --tags --exact-match 2> /dev/null || git rev-parse HEAD) | sed "s/^v//")
+.PHONY: version
+version:
+	@echo $(VERSION)
+
+BUILD=false
+ifneq ($(wildcard ./cmd/*),)
+BUILD=true
+GO_BUILD_DIR=build
+.PHONY: build
+build:
+	mkdir -p $(GO_BUILD_DIR)
+	go build -v -ldflags="-s -w -X main.version=$(VERSION)" -o $(GO_BUILD_DIR) ./cmd/...
+endif
+
 .PHONY: test
 test:
 	go test -v -cover -coverprofile=coverage.out ./...
@@ -13,8 +28,12 @@ test:
 	cat coverage.txt
 	go tool cover -html=coverage.out -o=coverage.html
 
+.PHONY: generate
+generate::
+	go generate -v ./...
+
 .PHONY: lint
-lint::
+lint:
 	$(MAKE) golangci-lint
 
 GOLANGCI_LINT_VERSION=v1.48.0
@@ -30,11 +49,11 @@ install-golangci-lint: $(GOLANGCI_LINT_BIN)
 GOLANGCI_LINT_RUN=$(GOLANGCI_LINT_BIN) -v run
 .PHONY: golangci-lint
 golangci-lint: install-golangci-lint
-ifneq ($(CI),true)
+ifeq ($(CI),true)
+	$(GOLANGCI_LINT_RUN)
+else
 # Fix errors if possible.
 	$(GOLANGCI_LINT_RUN) --fix
-else
-	$(GOLANGCI_LINT_RUN)
 endif
 
 .PHONY: golangci-lint-cache-clean
@@ -43,17 +62,22 @@ golangci-lint-cache-clean: install-golangci-lint
 
 .PHONY: mod-update
 mod-update:
-	go get -v -u -d all
+	go get -v -u all
 	$(MAKE) mod-tidy
 
 .PHONY: mod-tidy
 mod-tidy:
 	go mod tidy -v
 
+.PHONY: git-latest-release
+git-latest-release:
+	@git tag --list --sort=v:refname --format="%(refname:short) => %(creatordate:short)" | tail -n 1
+
 .PHONY: clean
-clean::
+clean:
 	git clean -fdX
 	go clean -cache -testcache
+	$(MAKE) golangci-lint-cache-clean
 
 ifeq ($(CI),true)
 
@@ -61,7 +85,13 @@ CI_LOG_GROUP_START=@echo "::group::$(1)"
 CI_LOG_GROUP_END=@echo "::endgroup::"
 
 .PHONY: ci
-ci::
+ci:
+ifeq ($(BUILD),true)
+	$(call CI_LOG_GROUP_START,build)
+	$(MAKE) build
+	$(call CI_LOG_GROUP_END)
+endif
+
 	$(call CI_LOG_GROUP_START,test)
 	$(MAKE) test
 	$(call CI_LOG_GROUP_END)

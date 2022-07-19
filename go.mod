@@ -1,3 +1,3 @@
 module github.com/pierrre/file-duplicate
 
-go 1.18
+go 1.19
