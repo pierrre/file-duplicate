@@ -23,7 +23,7 @@ func TestOK(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expectedStdout := filepath.Join(wd, "testdata", "1/b1") + "\n" + filepath.Join(wd, "testdata", "2/b2") + "\n\n"
+	expectedStdout := filepath.Join(wd, "testdata", "1", "b1") + "\n" + filepath.Join(wd, "testdata", "2", "b2") + "\n\n"
 	if stdout.String() != expectedStdout {
 		t.Errorf("unexpected stdout: got %q, want %q", stdout.String(), expectedStdout)
 	}
