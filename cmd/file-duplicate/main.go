@@ -2,13 +2,13 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 
+	"github.com/pierrre/errors"
 	fileduplicate "github.com/pierrre/file-duplicate"
 )
 
@@ -17,7 +17,7 @@ func main() {
 	l := log.Default()
 	err := run(fl, os.Stdout, l)
 	if err != nil {
-		l.Fatalf("Error: %v", err)
+		l.Fatalf("Error: %v", errors.VerboseFormatter(err))
 	}
 }
 
@@ -33,7 +33,7 @@ func run(fl *flags, w io.Writer, l *log.Logger) error {
 		_, _ = io.WriteString(w, "\n")
 	}, optfs...)
 	if err != nil {
-		return fmt.Errorf("scan: %w", err)
+		return errors.Wrap(err, "scan")
 	}
 	return nil
 }
@@ -55,7 +55,7 @@ func buildOptions(fl *flags, l *log.Logger) []fileduplicate.Option {
 	if fl.continueOnError {
 		optfs = append(optfs, fileduplicate.WithErrorHandler(func(err error) {
 			if fl.verbose {
-				l.Printf("Error: %v", err)
+				l.Printf("Error: %v", errors.VerboseFormatter(err))
 			}
 		}))
 	}

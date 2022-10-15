@@ -4,10 +4,11 @@ package fileduplicate
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"io"
 	"io/fs"
 	"sort"
+
+	"github.com/pierrre/errors"
 )
 
 type options struct {
@@ -124,7 +125,7 @@ func getFilesBySize(opts *options) (map[int64][]*File, error) {
 		wdf := newWalkDirFunc(opts, res, fsysIdx)
 		err := fs.WalkDir(fsys, ".", wdf)
 		if err != nil {
-			return nil, fmt.Errorf("walk dir: %w", err)
+			return nil, errors.Wrap(err, "walk dir")
 		}
 	}
 	return res, nil
@@ -134,17 +135,18 @@ func newWalkDirFunc(opts *options, res map[int64][]*File, fsysIdx int) fs.WalkDi
 	return func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			if opts.errorHandler != nil {
+				err = errors.Wrap(err, "walk dir")
 				opts.errorHandler(err)
 				return nil
 			}
-			return err
+			return errors.Wrap(err, "")
 		}
 		if !d.Type().IsRegular() {
 			return nil
 		}
 		fi, err := d.Info()
 		if err != nil {
-			err = fmt.Errorf("info: %w", err)
+			err = errors.Wrap(err, "info")
 			if opts.errorHandler != nil {
 				opts.errorHandler(err)
 				return nil
@@ -184,13 +186,13 @@ func hashFile(opts *options, fp *File) (string, error) {
 	fsys := opts.fss[fp.FSIndex]
 	f, err := fsys.Open(fp.Path)
 	if err != nil {
-		return "", fmt.Errorf("open: %w", err)
+		return "", errors.Wrap(err, "open")
 	}
 	defer f.Close() //nolint:errcheck
 	h := sha256.New()
 	_, err = io.Copy(h, f)
 	if err != nil {
-		return "", fmt.Errorf("copy: %w", err)
+		return "", errors.Wrap(err, "copy")
 	}
 	hs := h.Sum(nil)
 	res := hex.EncodeToString(hs)
