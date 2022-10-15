@@ -73,8 +73,7 @@ func TestErrorLog(t *testing.T) {
 	if stdout.String() != "" {
 		t.Errorf("unexpected stdout: got %q, want %q", stdout.String(), "")
 	}
-	expectedStderr := "Error: stat " + filepath.Join(wd, "invalid") + string(filepath.Separator) + ".: no such file or directory\n"
-	if stderr.String() != expectedStderr {
-		t.Errorf("unexpected stderr: got %q, want %q", stderr.String(), expectedStderr)
+	if stderr.Len() == 0 {
+		t.Error("no error logged")
 	}
 }
