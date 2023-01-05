@@ -25,10 +25,10 @@ func TestOK(t *testing.T) {
 	}
 	expectedStdout := filepath.Join(wd, "testdata", "1", "b1") + "\n" + filepath.Join(wd, "testdata", "2", "b2") + "\n\n"
 	if stdout.String() != expectedStdout {
-		t.Errorf("unexpected stdout: got %q, want %q", stdout.String(), expectedStdout)
+		t.Fatalf("unexpected stdout: got %q, want %q", stdout.String(), expectedStdout)
 	}
 	if stderr.String() != "" {
-		t.Errorf("unexpected stderr: got %q, want %q", stderr.String(), "")
+		t.Fatalf("unexpected stderr: got %q, want %q", stderr.String(), "")
 	}
 }
 
@@ -47,10 +47,10 @@ func TestErrorReturn(t *testing.T) {
 		t.Fatal("no error")
 	}
 	if stdout.String() != "" {
-		t.Errorf("unexpected stdout: got %q, want %q", stdout.String(), "")
+		t.Fatalf("unexpected stdout: got %q, want %q", stdout.String(), "")
 	}
 	if stderr.String() != "" {
-		t.Errorf("unexpected stderr: got %q, want %q", stderr.String(), "")
+		t.Fatalf("unexpected stderr: got %q, want %q", stderr.String(), "")
 	}
 }
 
@@ -71,9 +71,9 @@ func TestErrorLog(t *testing.T) {
 		t.Fatal(err)
 	}
 	if stdout.String() != "" {
-		t.Errorf("unexpected stdout: got %q, want %q", stdout.String(), "")
+		t.Fatalf("unexpected stdout: got %q, want %q", stdout.String(), "")
 	}
 	if stderr.Len() == 0 {
-		t.Error("no error logged")
+		t.Fatal("no error logged")
 	}
 }
