@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/pierrre/errors"
+	"github.com/pierrre/errors/errverbose"
 	fileduplicate "github.com/pierrre/file-duplicate"
 )
 
@@ -17,7 +18,7 @@ func main() {
 	l := log.Default()
 	err := run(fl, os.Stdout, l)
 	if err != nil {
-		l.Fatalf("Error: %v", errors.VerboseFormatter(err))
+		l.Fatalf("Error: %v", errverbose.Formatter(err))
 	}
 }
 
@@ -55,7 +56,7 @@ func buildOptions(fl *flags, l *log.Logger) []fileduplicate.Option {
 	if fl.continueOnError {
 		optfs = append(optfs, fileduplicate.WithErrorHandler(func(err error) {
 			if fl.verbose {
-				l.Printf("Error: %v", errors.VerboseFormatter(err))
+				l.Printf("Error: %v", errverbose.Formatter(err))
 			}
 		}))
 	}
