@@ -7,58 +7,51 @@ import (
 	"path"
 	"path/filepath"
 	"testing"
+
+	"github.com/pierrre/assert"
+	"github.com/pierrre/assert/ext/davecghspew"
+	"github.com/pierrre/assert/ext/pierrrecompare"
+	"github.com/pierrre/assert/ext/pierrreerrors"
 )
+
+func init() {
+	pierrrecompare.Configure()
+	davecghspew.ConfigureDefault()
+	pierrreerrors.Configure()
+}
 
 func TestOK(t *testing.T) {
 	wd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 	fl := newFlags()
 	fl.roots = []string{path.Join(wd, "testdata")}
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
 	l := log.New(stderr, "", 0)
 	err = run(fl, stdout, l)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 	expectedStdout := filepath.Join(wd, "testdata", "1", "b1") + "\n" + filepath.Join(wd, "testdata", "2", "b2") + "\n\n"
-	if stdout.String() != expectedStdout {
-		t.Fatalf("unexpected stdout: got %q, want %q", stdout.String(), expectedStdout)
-	}
-	if stderr.String() != "" {
-		t.Fatalf("unexpected stderr: got %q, want %q", stderr.String(), "")
-	}
+	assert.Equal(t, stdout.String(), expectedStdout)
+	assert.StringEmpty(t, stderr.String())
 }
 
 func TestErrorReturn(t *testing.T) {
 	wd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 	fl := newFlags()
 	fl.roots = []string{path.Join(wd, "invalid")}
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
 	l := log.New(stderr, "", 0)
 	err = run(fl, stdout, l)
-	if err == nil {
-		t.Fatal("no error")
-	}
-	if stdout.String() != "" {
-		t.Fatalf("unexpected stdout: got %q, want %q", stdout.String(), "")
-	}
-	if stderr.String() != "" {
-		t.Fatalf("unexpected stderr: got %q, want %q", stderr.String(), "")
-	}
+	assert.Error(t, err)
+	assert.StringEmpty(t, stdout.String())
+	assert.StringEmpty(t, stderr.String())
 }
 
 func TestErrorLog(t *testing.T) {
 	wd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
 	fl := newFlags()
 	fl.verbose = true
 	fl.continueOnError = true
@@ -67,13 +60,7 @@ func TestErrorLog(t *testing.T) {
 	stderr := new(bytes.Buffer)
 	l := log.New(stderr, "", 0)
 	err = run(fl, stdout, l)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if stdout.String() != "" {
-		t.Fatalf("unexpected stdout: got %q, want %q", stdout.String(), "")
-	}
-	if stderr.Len() == 0 {
-		t.Fatal("no error logged")
-	}
+	assert.NoError(t, err)
+	assert.StringEmpty(t, stdout.String())
+	assert.StringNotEmpty(t, stderr.String())
 }
