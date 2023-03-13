@@ -1,6 +1,7 @@
 package fileduplicate
 
 import (
+	"context"
 	"io/fs"
 	"testing"
 	"testing/fstest"
@@ -18,6 +19,7 @@ func init() {
 }
 
 func TestGet(t *testing.T) {
+	ctx := context.Background()
 	fsys := fstest.MapFS{
 		"a": &fstest.MapFile{
 			Data: []byte(("a")),
@@ -31,7 +33,7 @@ func TestGet(t *testing.T) {
 		"1/empty1": &fstest.MapFile{},
 		"2/empty2": &fstest.MapFile{},
 	}
-	dups, err := Get(WithFSs([]fs.FS{fsys}))
+	dups, err := Get(ctx, WithFSs([]fs.FS{fsys}))
 	assert.NoError(t, err)
 	expected := [][]*File{
 		{

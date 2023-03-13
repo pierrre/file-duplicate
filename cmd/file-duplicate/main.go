@@ -2,29 +2,32 @@
 package main
 
 import (
+	"context"
 	"io"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/pierrre/errors"
 	"github.com/pierrre/errors/errverbose"
 	fileduplicate "github.com/pierrre/file-duplicate"
+	"golang.org/x/exp/slog"
 )
 
 func main() {
+	ctx := context.Background()
 	fl := parseFlags()
-	l := log.Default()
-	err := run(fl, os.Stdout, l)
+	l := slog.Default()
+	err := run(ctx, fl, os.Stdout, l)
 	if err != nil {
-		l.Fatalf("Error: %v", errverbose.Formatter(err))
+		l.LogAttrs(ctx, slog.LevelError, errverbose.String(err))
+		os.Exit(1)
 	}
 }
 
-func run(fl *flags, w io.Writer, l *log.Logger) error {
+func run(ctx context.Context, fl *flags, w io.Writer, l *slog.Logger) error {
 	optfs := buildOptions(fl, l)
-	err := fileduplicate.Scan(func(fps []*fileduplicate.File) {
+	err := fileduplicate.Scan(ctx, func(fps []*fileduplicate.File) {
 		for _, fp := range fps {
 			root := fl.roots[fp.FSIndex]
 			p := filepath.Join(root, fp.Path)
@@ -39,7 +42,7 @@ func run(fl *flags, w io.Writer, l *log.Logger) error {
 	return nil
 }
 
-func buildOptions(fl *flags, l *log.Logger) []fileduplicate.Option {
+func buildOptions(fl *flags, l *slog.Logger) []fileduplicate.Option {
 	var optfs []fileduplicate.Option
 	fsyss := make([]fs.FS, len(fl.roots))
 	for i, root := range fl.roots {
@@ -50,9 +53,9 @@ func buildOptions(fl *flags, l *log.Logger) []fileduplicate.Option {
 		optfs = append(optfs, fileduplicate.WithMinSize(fl.minSize))
 	}
 	if fl.continueOnError {
-		optfs = append(optfs, fileduplicate.WithErrorHandler(func(err error) {
+		optfs = append(optfs, fileduplicate.WithErrorHandler(func(ctx context.Context, err error) {
 			if fl.verbose {
-				l.Printf("Error: %v", errverbose.Formatter(err))
+				l.LogAttrs(ctx, slog.LevelError, errverbose.String(err))
 			}
 		}))
 	}
