@@ -43,10 +43,6 @@ func buildOptions(fl *flags, l *log.Logger) []fileduplicate.Option {
 	var optfs []fileduplicate.Option
 	fsyss := make([]fs.FS, len(fl.roots))
 	for i, root := range fl.roots {
-		root = filepath.Clean(root)
-		if root == "/" {
-			root = ""
-		}
 		fsyss[i] = os.DirFS(root)
 	}
 	optfs = append(optfs, fileduplicate.WithFSs(fsyss))
