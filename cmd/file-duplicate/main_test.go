@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"log"
+	"context"
 	"os"
 	"path"
 	"path/filepath"
@@ -12,6 +12,7 @@ import (
 	"github.com/pierrre/assert/ext/davecghspew"
 	"github.com/pierrre/assert/ext/pierrrecompare"
 	"github.com/pierrre/assert/ext/pierrreerrors"
+	"golang.org/x/exp/slog"
 )
 
 func init() {
@@ -21,14 +22,15 @@ func init() {
 }
 
 func TestOK(t *testing.T) {
+	ctx := context.Background()
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 	fl := newFlags()
 	fl.roots = []string{path.Join(wd, "testdata")}
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
-	l := log.New(stderr, "", 0)
-	err = run(fl, stdout, l)
+	l := slog.New(slog.NewTextHandler(stderr))
+	err = run(ctx, fl, stdout, l)
 	assert.NoError(t, err)
 	expectedStdout := filepath.Join(wd, "testdata", "1", "b1") + "\n" + filepath.Join(wd, "testdata", "2", "b2") + "\n\n"
 	assert.Equal(t, stdout.String(), expectedStdout)
@@ -36,20 +38,22 @@ func TestOK(t *testing.T) {
 }
 
 func TestErrorReturn(t *testing.T) {
+	ctx := context.Background()
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 	fl := newFlags()
 	fl.roots = []string{path.Join(wd, "invalid")}
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
-	l := log.New(stderr, "", 0)
-	err = run(fl, stdout, l)
+	l := slog.New(slog.NewTextHandler(stderr))
+	err = run(ctx, fl, stdout, l)
 	assert.Error(t, err)
 	assert.StringEmpty(t, stdout.String())
 	assert.StringEmpty(t, stderr.String())
 }
 
 func TestErrorLog(t *testing.T) {
+	ctx := context.Background()
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 	fl := newFlags()
@@ -58,8 +62,8 @@ func TestErrorLog(t *testing.T) {
 	fl.roots = []string{path.Join(wd, "invalid")}
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
-	l := log.New(stderr, "", 0)
-	err = run(fl, stdout, l)
+	l := slog.New(slog.NewTextHandler(stderr))
+	err = run(ctx, fl, stdout, l)
 	assert.NoError(t, err)
 	assert.StringEmpty(t, stdout.String())
 	assert.StringNotEmpty(t, stderr.String())

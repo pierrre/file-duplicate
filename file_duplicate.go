@@ -2,6 +2,7 @@
 package fileduplicate
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"io"
@@ -14,7 +15,7 @@ import (
 type options struct {
 	fss          []fs.FS
 	minSize      int64
-	errorHandler func(error)
+	errorHandler func(context.Context, error)
 }
 
 func newOptions(optfs ...Option) *options {
@@ -47,7 +48,7 @@ func WithMinSize(minSize int64) Option {
 // WithErrorHandler is an option that defines the error handler.
 //
 // If it is defined, the error handler is called for each error, otherwise the error is returned.
-func WithErrorHandler(f func(error)) Option {
+func WithErrorHandler(f func(context.Context, error)) Option {
 	return func(o *options) {
 		o.errorHandler = f
 	}
@@ -62,9 +63,9 @@ type File struct {
 }
 
 // Get returns the duplicated files.
-func Get(optfs ...Option) ([][]*File, error) {
+func Get(ctx context.Context, optfs ...Option) ([][]*File, error) {
 	var res [][]*File
-	err := Scan(func(fps []*File) {
+	err := Scan(ctx, func(fps []*File) {
 		res = append(res, fps)
 	}, optfs...)
 	if err != nil {
@@ -76,14 +77,14 @@ func Get(optfs ...Option) ([][]*File, error) {
 // Scan scans for duplicated files.
 //
 // The onDuplicates function is called for each duplicated file.
-func Scan(onDuplicates func([]*File), optfs ...Option) error {
+func Scan(ctx context.Context, onDuplicates func([]*File), optfs ...Option) error {
 	opts := newOptions(optfs...)
-	sameSizeFiles, err := getSameSizeFiles(opts)
+	sameSizeFiles, err := getSameSizeFiles(ctx, opts)
 	if err != nil {
 		return err
 	}
 	for _, fpsS := range sameSizeFiles {
-		filesByHash, err := getFilesByHash(opts, fpsS)
+		filesByHash, err := getFilesByHash(ctx, opts, fpsS)
 		if err != nil {
 			return err
 		}
@@ -97,8 +98,8 @@ func Scan(onDuplicates func([]*File), optfs ...Option) error {
 	return nil
 }
 
-func getSameSizeFiles(opts *options) ([][]*File, error) {
-	filesBySize, err := getFilesBySize(opts)
+func getSameSizeFiles(ctx context.Context, opts *options) ([][]*File, error) {
+	filesBySize, err := getFilesBySize(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -119,10 +120,10 @@ func getSameSizeFiles(opts *options) ([][]*File, error) {
 	return res, nil
 }
 
-func getFilesBySize(opts *options) (map[int64][]*File, error) {
+func getFilesBySize(ctx context.Context, opts *options) (map[int64][]*File, error) {
 	res := make(map[int64][]*File)
 	for fsysIdx, fsys := range opts.fss {
-		wdf := newWalkDirFunc(opts, res, fsysIdx)
+		wdf := newWalkDirFunc(ctx, opts, res, fsysIdx)
 		err := fs.WalkDir(fsys, ".", wdf)
 		if err != nil {
 			return nil, errors.Wrap(err, "walk dir")
@@ -131,12 +132,12 @@ func getFilesBySize(opts *options) (map[int64][]*File, error) {
 	return res, nil
 }
 
-func newWalkDirFunc(opts *options, res map[int64][]*File, fsysIdx int) fs.WalkDirFunc {
+func newWalkDirFunc(ctx context.Context, opts *options, res map[int64][]*File, fsysIdx int) fs.WalkDirFunc {
 	return func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			if opts.errorHandler != nil {
 				err = errors.Wrap(err, "walk dir")
-				opts.errorHandler(err)
+				opts.errorHandler(ctx, err)
 				return nil
 			}
 			return errors.Wrap(err, "")
@@ -148,7 +149,7 @@ func newWalkDirFunc(opts *options, res map[int64][]*File, fsysIdx int) fs.WalkDi
 		if err != nil {
 			err = errors.Wrap(err, "info")
 			if opts.errorHandler != nil {
-				opts.errorHandler(err)
+				opts.errorHandler(ctx, err)
 				return nil
 			}
 			return err
@@ -166,13 +167,13 @@ func newWalkDirFunc(opts *options, res map[int64][]*File, fsysIdx int) fs.WalkDi
 	}
 }
 
-func getFilesByHash(opts *options, files []*File) (map[string][]*File, error) {
+func getFilesByHash(ctx context.Context, opts *options, files []*File) (map[string][]*File, error) {
 	res := make(map[string][]*File)
 	for _, file := range files {
 		h, err := hashFile(opts, file)
 		if err != nil {
 			if opts.errorHandler != nil {
-				opts.errorHandler(err)
+				opts.errorHandler(ctx, err)
 				continue
 			}
 			return nil, err
