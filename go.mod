@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/pierrre/assert v0.1.2
-	github.com/pierrre/errors v0.3.4
+	github.com/pierrre/errors v0.3.6
 	golang.org/x/exp v0.0.0-20230310171629-522b1b587ee0
 )
 
