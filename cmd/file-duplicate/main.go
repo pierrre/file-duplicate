@@ -5,13 +5,13 @@ import (
 	"context"
 	"io"
 	"io/fs"
+	"log/slog"
 	"os"
 	"path/filepath"
 
 	"github.com/pierrre/errors"
 	"github.com/pierrre/errors/errverbose"
 	fileduplicate "github.com/pierrre/file-duplicate"
-	"golang.org/x/exp/slog"
 )
 
 func main() {

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"log/slog"
 	"os"
 	"path"
 	"path/filepath"
@@ -12,7 +13,6 @@ import (
 	"github.com/pierrre/assert/ext/pierrrecompare"
 	"github.com/pierrre/assert/ext/pierrreerrors"
 	"github.com/pierrre/assert/ext/pierrrepretty"
-	"golang.org/x/exp/slog"
 )
 
 func init() {
