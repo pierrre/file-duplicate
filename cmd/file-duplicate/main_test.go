@@ -29,7 +29,7 @@ func TestOK(t *testing.T) {
 	fl.roots = []string{path.Join(wd, "testdata")}
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
-	l := slog.New(slog.NewTextHandler(stderr))
+	l := slog.New(slog.NewTextHandler(stderr, nil))
 	err = run(ctx, fl, stdout, l)
 	assert.NoError(t, err)
 	expectedStdout := filepath.Join(wd, "testdata", "1", "b1") + "\n" + filepath.Join(wd, "testdata", "2", "b2") + "\n\n"
@@ -45,7 +45,7 @@ func TestErrorReturn(t *testing.T) {
 	fl.roots = []string{path.Join(wd, "invalid")}
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
-	l := slog.New(slog.NewTextHandler(stderr))
+	l := slog.New(slog.NewTextHandler(stderr, nil))
 	err = run(ctx, fl, stdout, l)
 	assert.Error(t, err)
 	assert.StringEmpty(t, stdout.String())
@@ -62,7 +62,7 @@ func TestErrorLog(t *testing.T) {
 	fl.roots = []string{path.Join(wd, "invalid")}
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
-	l := slog.New(slog.NewTextHandler(stderr))
+	l := slog.New(slog.NewTextHandler(stderr, nil))
 	err = run(ctx, fl, stdout, l)
 	assert.NoError(t, err)
 	assert.StringEmpty(t, stdout.String())
