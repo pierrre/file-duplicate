@@ -3,7 +3,7 @@ module github.com/pierrre/file-duplicate
 go 1.21.0
 
 require (
-	github.com/pierrre/assert v0.3.0
+	github.com/pierrre/assert v0.3.1
 	github.com/pierrre/errors v0.5.1
 )
 
