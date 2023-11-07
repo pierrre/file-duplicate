@@ -31,21 +31,21 @@ func newOptions(optfs ...Option) *options {
 // Option represents an option.
 type Option func(*options)
 
-// WithFSs is an option that defines the filesystems to scan.
+// WithFSs is an [Option] that defines the filesystems to scan.
 func WithFSs(fsyss []fs.FS) Option {
 	return func(o *options) {
 		o.fss = fsyss
 	}
 }
 
-// WithMinSize is an option that defines the minimum file size to consider.
+// WithMinSize is an [Option] that defines the minimum file size to consider.
 func WithMinSize(minSize int64) Option {
 	return func(o *options) {
 		o.minSize = minSize
 	}
 }
 
-// WithErrorHandler is an option that defines the error handler.
+// WithErrorHandler is an [Option] that defines the error handler.
 //
 // If it is defined, the error handler is called for each error, otherwise the error is returned.
 func WithErrorHandler(f func(context.Context, error)) Option {
@@ -62,7 +62,7 @@ type File struct {
 	Path string
 }
 
-// Get returns the duplicated files.
+// Get returns the duplicated [Files].
 func Get(ctx context.Context, optfs ...Option) ([][]*File, error) {
 	var res [][]*File
 	err := Scan(ctx, func(fps []*File) {
@@ -74,7 +74,7 @@ func Get(ctx context.Context, optfs ...Option) ([][]*File, error) {
 	return res, nil
 }
 
-// Scan scans for duplicated files.
+// Scan scans for duplicated [Files].
 //
 // The onDuplicates function is called for each duplicated file.
 func Scan(ctx context.Context, onDuplicates func([]*File), optfs ...Option) error {
