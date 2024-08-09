@@ -4,7 +4,7 @@ go 1.22.0
 
 require (
 	github.com/pierrre/assert v0.3.8
-	github.com/pierrre/errors v0.7.2
+	github.com/pierrre/errors v0.8.1
 )
 
 require (
