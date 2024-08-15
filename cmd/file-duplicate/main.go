@@ -12,6 +12,7 @@ import (
 	"github.com/pierrre/errors"
 	"github.com/pierrre/errors/errverbose"
 	fileduplicate "github.com/pierrre/file-duplicate"
+	"github.com/pierrre/go-libs/unsafeio"
 )
 
 func main() {
@@ -31,10 +32,10 @@ func run(ctx context.Context, fl *flags, w io.Writer, l *slog.Logger) error {
 		for _, fp := range fps {
 			root := fl.roots[fp.FSIndex]
 			p := filepath.Join(root, fp.Path)
-			_, _ = io.WriteString(w, p)
-			_, _ = io.WriteString(w, "\n")
+			_, _ = unsafeio.WriteString(w, p)
+			_, _ = unsafeio.WriteString(w, "\n")
 		}
-		_, _ = io.WriteString(w, "\n")
+		_, _ = unsafeio.WriteString(w, "\n")
 	}, optfs...)
 	if err != nil {
 		return errors.Wrap(err, "scan")
