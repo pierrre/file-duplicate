@@ -25,7 +25,7 @@ func TestOK(t *testing.T) {
 	assert.NoError(t, err)
 	expectedStdout := filepath.Join(wd, "testdata", "1", "b1") + "\n" + filepath.Join(wd, "testdata", "2", "b2") + "\n\n"
 	assert.Equal(t, stdout.String(), expectedStdout)
-	assert.StringEmpty(t, stderr.String())
+	assert.Zero(t, stderr.String())
 }
 
 func TestErrorReturn(t *testing.T) {
@@ -39,8 +39,8 @@ func TestErrorReturn(t *testing.T) {
 	l := slog.New(slog.NewTextHandler(stderr, nil))
 	err = run(ctx, fl, stdout, l)
 	assert.Error(t, err)
-	assert.StringEmpty(t, stdout.String())
-	assert.StringEmpty(t, stderr.String())
+	assert.Zero(t, stdout.String())
+	assert.Zero(t, stderr.String())
 }
 
 func TestErrorLog(t *testing.T) {
@@ -56,6 +56,6 @@ func TestErrorLog(t *testing.T) {
 	l := slog.New(slog.NewTextHandler(stderr, nil))
 	err = run(ctx, fl, stdout, l)
 	assert.NoError(t, err)
-	assert.StringEmpty(t, stdout.String())
-	assert.StringNotEmpty(t, stderr.String())
+	assert.Zero(t, stdout.String())
+	assert.NotZero(t, stderr.String())
 }
