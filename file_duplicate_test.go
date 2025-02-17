@@ -1,7 +1,6 @@
 package fileduplicate
 
 import (
-	"context"
 	"io/fs"
 	"testing"
 	"testing/fstest"
@@ -10,7 +9,7 @@ import (
 )
 
 func TestGet(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	fsys := fstest.MapFS{
 		"a": &fstest.MapFile{
 			Data: []byte(("a")),

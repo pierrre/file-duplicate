@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"log/slog"
 	"os"
 	"path"
@@ -13,7 +12,7 @@ import (
 )
 
 func TestOK(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 	fl := newFlags()
@@ -29,7 +28,7 @@ func TestOK(t *testing.T) {
 }
 
 func TestErrorReturn(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 	fl := newFlags()
@@ -44,7 +43,7 @@ func TestErrorReturn(t *testing.T) {
 }
 
 func TestErrorLog(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	wd, err := os.Getwd()
 	assert.NoError(t, err)
 	fl := newFlags()
