@@ -189,7 +189,7 @@ func hashFile(opts *options, fp *File) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "open")
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck
 	h := sha256.New()
 	_, err = io.Copy(h, f)
 	if err != nil {
