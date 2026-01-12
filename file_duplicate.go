@@ -7,7 +7,7 @@ import (
 	"encoding/hex"
 	"io"
 	"io/fs"
-	"sort"
+	"slices"
 
 	"github.com/pierrre/errors"
 )
@@ -109,9 +109,7 @@ func getSameSizeFiles(ctx context.Context, opts *options) ([][]*File, error) {
 			sizes = append(sizes, size)
 		}
 	}
-	sort.Slice(sizes, func(i, j int) bool {
-		return sizes[i] < sizes[j]
-	})
+	slices.Sort(sizes)
 	res := make([][]*File, 0, len(sizes))
 	for _, size := range sizes {
 		fps := filesBySize[size]
