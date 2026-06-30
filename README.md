@@ -26,5 +26,5 @@ go get github.com/pierrre/file-duplicate@latest
 
 - Walk the filesystems
 - Group files by identical size
-- Compute the SHA256 hash of same size files
-- Files with same hash are duplicates
+- Compute the SHA256 hash of files of the same size
+- Files with the same hash are duplicates
