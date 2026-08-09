@@ -61,6 +61,18 @@ func TestOKMinSizePositive(t *testing.T) {
 	assert.Zero(t, stderr.String())
 }
 
+func TestErrorNoRoots(t *testing.T) {
+	ctx := t.Context()
+	fl := newFlags()
+	stdout := new(bytes.Buffer)
+	stderr := new(bytes.Buffer)
+	l := slog.New(slog.NewTextHandler(stderr, nil))
+	err := run(ctx, fl, stdout, l)
+	assert.Error(t, err)
+	assert.Zero(t, stdout.String())
+	assert.Zero(t, stderr.String())
+}
+
 func TestErrorReturn(t *testing.T) {
 	ctx := t.Context()
 	wd, err := os.Getwd()
