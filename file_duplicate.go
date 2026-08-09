@@ -84,6 +84,10 @@ func Scan(ctx context.Context, onDuplicates func([]*File), optfs ...Option) erro
 		return err
 	}
 	for _, fpsS := range sameSizeFiles {
+		err := ctx.Err()
+		if err != nil {
+			return errors.Wrap(err, "scan")
+		}
 		filesByHash, err := getFilesByHash(ctx, opts, fpsS)
 		if err != nil {
 			return err
@@ -121,8 +125,12 @@ func getSameSizeFiles(ctx context.Context, opts *options) ([][]*File, error) {
 func getFilesBySize(ctx context.Context, opts *options) (map[int64][]*File, error) {
 	res := make(map[int64][]*File)
 	for fsysIdx, fsys := range opts.fss {
+		err := ctx.Err()
+		if err != nil {
+			return nil, errors.Wrap(err, "walk dir")
+		}
 		wdf := newWalkDirFunc(ctx, opts, res, fsysIdx)
-		err := fs.WalkDir(fsys, ".", wdf)
+		err = fs.WalkDir(fsys, ".", wdf)
 		if err != nil {
 			return nil, errors.Wrap(err, "walk dir")
 		}
@@ -132,6 +140,10 @@ func getFilesBySize(ctx context.Context, opts *options) (map[int64][]*File, erro
 
 func newWalkDirFunc(ctx context.Context, opts *options, res map[int64][]*File, fsysIdx int) fs.WalkDirFunc {
 	return func(path string, d fs.DirEntry, err error) error {
+		ctxErr := ctx.Err()
+		if ctxErr != nil {
+			return errors.Wrap(ctxErr, "walk dir")
+		}
 		if err != nil {
 			if opts.errorHandler != nil {
 				err = errors.Wrap(err, "walk dir")
@@ -168,6 +180,10 @@ func newWalkDirFunc(ctx context.Context, opts *options, res map[int64][]*File, f
 func getFilesByHash(ctx context.Context, opts *options, files []*File) (map[string][]*File, error) {
 	res := make(map[string][]*File)
 	for _, file := range files {
+		err := ctx.Err()
+		if err != nil {
+			return nil, errors.Wrap(err, "hash")
+		}
 		h, err := hashFile(opts, file)
 		if err != nil {
 			if opts.errorHandler != nil {
