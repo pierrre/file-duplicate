@@ -39,3 +39,45 @@ func TestGet(t *testing.T) {
 	}
 	assert.DeepEqual(t, dups, expected)
 }
+
+func TestGetMinSizeZero(t *testing.T) {
+	ctx := t.Context()
+	fsys := fstest.MapFS{
+		"a": &fstest.MapFile{
+			Data: []byte(("a")),
+		},
+		"1/b1": &fstest.MapFile{
+			Data: []byte(("b")),
+		},
+		"2/b2": &fstest.MapFile{
+			Data: []byte(("b")),
+		},
+		"1/empty1": &fstest.MapFile{},
+		"2/empty2": &fstest.MapFile{},
+	}
+	dups, err := Get(ctx, WithFSs([]fs.FS{fsys}), WithMinSize(0))
+	assert.NoError(t, err)
+	expected := [][]*File{
+		{
+			{
+				FSIndex: 0,
+				Path:    "1/empty1",
+			},
+			{
+				FSIndex: 0,
+				Path:    "2/empty2",
+			},
+		},
+		{
+			{
+				FSIndex: 0,
+				Path:    "1/b1",
+			},
+			{
+				FSIndex: 0,
+				Path:    "2/b2",
+			},
+		},
+	}
+	assert.DeepEqual(t, dups, expected)
+}
