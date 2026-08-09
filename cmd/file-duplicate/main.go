@@ -49,10 +49,7 @@ func buildOptions(fl *flags, l *slog.Logger) []fileduplicate.Option {
 	for i, root := range fl.roots {
 		fsyss[i] = os.DirFS(root)
 	}
-	optfs = append(optfs, fileduplicate.WithFSs(fsyss))
-	if fl.minSize != 0 {
-		optfs = append(optfs, fileduplicate.WithMinSize(fl.minSize))
-	}
+	optfs = append(optfs, fileduplicate.WithFSs(fsyss), fileduplicate.WithMinSize(fl.minSize))
 	if fl.continueOnError {
 		optfs = append(optfs, fileduplicate.WithErrorHandler(func(ctx context.Context, err error) {
 			if fl.verbose {
