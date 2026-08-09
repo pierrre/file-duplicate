@@ -15,7 +15,7 @@ type flags struct {
 func parseFlags() *flags {
 	fl := newFlags()
 	fls := flag.NewFlagSet("", flag.ExitOnError)
-	fls.BoolVar(&fl.verbose, "v", fl.verbose, "verbose")
+	fls.BoolVar(&fl.verbose, "v", fl.verbose, "verbose (only effective with -continue-on-error)")
 	fls.BoolVar(&fl.continueOnError, "continue-on-error", fl.continueOnError, "continue on error")
 	fls.Int64Var(&fl.minSize, "min-size", fl.minSize, "min size")
 	_ = fls.Parse(os.Args[1:])
