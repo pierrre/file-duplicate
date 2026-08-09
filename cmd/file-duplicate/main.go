@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"os"
+	"os/signal"
 	"path/filepath"
 
 	"github.com/pierrre/errors"
@@ -16,14 +17,22 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
+	os.Exit(mainRun())
+}
+
+func mainRun() int {
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
 	fl := parseFlags()
 	l := slog.Default()
 	err := run(ctx, fl, os.Stdout, l)
 	if err != nil {
-		l.LogAttrs(ctx, slog.LevelError, errverbose.String(err))
-		os.Exit(1)
+		if !errors.Is(err, context.Canceled) {
+			l.LogAttrs(ctx, slog.LevelError, errverbose.String(err))
+		}
+		return 1
 	}
+	return 0
 }
 
 func run(ctx context.Context, fl *flags, w io.Writer, l *slog.Logger) error {

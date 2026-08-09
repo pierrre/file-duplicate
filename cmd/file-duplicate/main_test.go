@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"log/slog"
 	"os"
 	"path"
@@ -90,4 +91,20 @@ func TestErrorLog(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Zero(t, stdout.String())
 	assert.NotZero(t, stderr.String())
+}
+
+func TestRunCanceled(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	wd, err := os.Getwd()
+	assert.NoError(t, err)
+	fl := newFlags()
+	fl.roots = []string{path.Join(wd, "testdata")}
+	stdout := new(bytes.Buffer)
+	stderr := new(bytes.Buffer)
+	l := slog.New(slog.NewTextHandler(stderr, nil))
+	err = run(ctx, fl, stdout, l)
+	assert.ErrorIs(t, err, context.Canceled)
+	assert.Zero(t, stdout.String())
+	assert.Zero(t, stderr.String())
 }
