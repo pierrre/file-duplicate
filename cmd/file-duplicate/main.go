@@ -36,6 +36,9 @@ func mainRun() int {
 }
 
 func run(ctx context.Context, fl *flags, w io.Writer, l *slog.Logger) error {
+	if len(fl.roots) == 0 {
+		return errors.New("no roots specified")
+	}
 	optfs := buildOptions(fl, l)
 	err := fileduplicate.Scan(ctx, func(fps []*fileduplicate.File) {
 		for _, fp := range fps {
