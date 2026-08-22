@@ -13,13 +13,13 @@ func TestGet(t *testing.T) {
 	ctx := t.Context()
 	fsys := fstest.MapFS{
 		"a": &fstest.MapFile{
-			Data: []byte(("a")),
+			Data: []byte("a"),
 		},
 		"1/b1": &fstest.MapFile{
-			Data: []byte(("b")),
+			Data: []byte("b"),
 		},
 		"2/b2": &fstest.MapFile{
-			Data: []byte(("b")),
+			Data: []byte("b"),
 		},
 		"1/empty1": &fstest.MapFile{},
 		"2/empty2": &fstest.MapFile{},
@@ -45,13 +45,13 @@ func TestGetMinSizeZero(t *testing.T) {
 	ctx := t.Context()
 	fsys := fstest.MapFS{
 		"a": &fstest.MapFile{
-			Data: []byte(("a")),
+			Data: []byte("a"),
 		},
 		"1/b1": &fstest.MapFile{
-			Data: []byte(("b")),
+			Data: []byte("b"),
 		},
 		"2/b2": &fstest.MapFile{
-			Data: []byte(("b")),
+			Data: []byte("b"),
 		},
 		"1/empty1": &fstest.MapFile{},
 		"2/empty2": &fstest.MapFile{},
