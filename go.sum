@@ -6,5 +6,5 @@ github.com/pierrre/errors v0.18.1 h1:3C7WmcDSneB4wQTSt/imdKpC1mBapmBVTAQPoCSDtxQ
 github.com/pierrre/errors v0.18.1/go.mod h1:fXWfpVjSvLQJwZMLLQi8qyXW0ww3EcjbKZZSoOzwelE=
 github.com/pierrre/go-libs v0.34.8 h1:Wyrzfk+qNPpHrNpd31GfaNMVEeRQVhxz3j3MfDvlVZE=
 github.com/pierrre/go-libs v0.34.8/go.mod h1:EHXn0WKC53KrJiAsRjAm9eBcxNkPmzwVX6pRjnbRZuE=
-github.com/pierrre/pretty v0.26.6 h1:bL4SgdD/RkIYN58FT3ZCCQVIq8mWSYFK3wGwibyCJiI=
-github.com/pierrre/pretty v0.26.6/go.mod h1:g79mEtZ7k4rPdPjqWa2pMVMYEOoU80VwJomZRtiIqfw=
+github.com/pierrre/pretty v0.26.8 h1:gdiu+QXNJ7rsvxL241me9daFtkJAzMbk8Fc+1KIWhug=
+github.com/pierrre/pretty v0.26.8/go.mod h1:HOPWCPrHoNZsG95/egRGCFYyG54PTUB+i6YfY21zy0U=
